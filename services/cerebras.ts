@@ -13,7 +13,7 @@ export const cerebrasService: AIService = {
             model: 'zai-glm-4.7',
             stream: true,
             max_completion_tokens: 65000,
-            temperature: 1,
+            temperature: 0.2, // Libertad de la IA
             top_p: 0.95
         });
 

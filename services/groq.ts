@@ -8,14 +8,9 @@ export const groqService: AIService = {
     name: 'Groq',
     async chat(messages: ChatMessage[]) {
         const chatCompletion = await groq.chat.completions.create({
-            "messages": [
-                {
-                    "role": "user",
-                    "content": "¿Comose como se soluciona Fibonacci en JavaScript?"
-                }
-            ],
+            "messages": messages as any,
             "model": "qwen/qwen3.6-27b",
-            "temperature": 0.6,
+            "temperature": 0.2, // Libertad de la IA
             "max_completion_tokens": 4096,
             "top_p": 0.95,
             "stream": true,
