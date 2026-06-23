@@ -183,8 +183,9 @@ Las dependencias siempre apuntan hacia el núcleo del negocio, manteniendo el do
 ### Architecture Overview
 
 ```text
-                   ┌──────────────┐
+       ┌──────────────┐
                    │   WhatsApp   │
+                   │    / HTTP    │
                    └──────┬───────┘
                           │
                    ┌──────▼───────┐
@@ -197,14 +198,18 @@ Las dependencias siempre apuntan hacia el núcleo del negocio, manteniendo el do
                           │
                    ┌──────▼───────┐
                    │    Domain    │
-                   └──────┬───────┘
-                          │
-          ┌───────────────┼──────────────────────┐
-          │               │                      │
-   ┌──────▼──────────┐ ┌──▼─────────┐ ┌─────────▼────────┐
-   │ Mock Student    │ │    Groq    │ │    Cerebras      │
-   │ Repository      │ └────────────┘ └──────────────────┘
-   └─────────────────┘
+                   └──────────────┘
+
+        ┌───────────────────────────────────────────────┐
+        │                Infrastructure                 │
+        ├───────────────────────────────────────────────┤
+        │ - Mock Student Repository                     │
+        │ - InMemory Conversation Repository            │
+        │ - Groq AI Provider                            │
+        │ - Cerebras AI Provider                        │
+        │ - AI Provider Rotator                         │
+        │ - WhatsApp Client / Gateway / Listener        │
+        └───────────────────────────────────────────────┘
 ```
 
 ---
