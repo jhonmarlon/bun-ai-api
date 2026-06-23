@@ -1,32 +1,7 @@
-export interface CourseActivity {
-    id: number;
-    name: string;
-    type: 'assignment' | 'quiz' | 'forum' | 'resource';
-    completed: boolean;
-    dueDate?: string;
-    grade?: number;
-    description: string;
-}
+import type { MoodleUser, MoodleUserDatasource } from "../contracts/moodle-users.datasource";
 
-export interface Course {
-    id: number;
-    name: string;
-    teacher: string;
-    progress: number;
-    grade: number;
-    description: string;
-    syllabus: string[];
-    activities: CourseActivity[];
-}
 
-export interface MoodleUser {
-    id: number;
-    fullname: string;
-    email: string;
-    courses: Course[];
-}
-
-export class MoodleDatasource {
+export class MockMoodleUserDatasourceImpl implements MoodleUserDatasource {
 
     private users: MoodleUser[] = [
 
