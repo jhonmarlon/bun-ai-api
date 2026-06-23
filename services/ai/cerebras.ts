@@ -1,5 +1,4 @@
-import { ChatMessage } from './../types';
-import type { AIService } from "../types";
+import type { AIService, ChatMessage } from '../../contracts/ai.service';
 import Cerebras from '@cerebras/cerebras_cloud_sdk';
 
 

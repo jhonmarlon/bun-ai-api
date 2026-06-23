@@ -1,6 +1,5 @@
-import { ChatMessage } from './../types';
+import type { AIService, ChatMessage } from '../../contracts/ai.service';
 import { Groq } from 'groq-sdk';
-import type { AIService } from '../types';
 
 const groq = new Groq();
 
