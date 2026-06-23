@@ -183,7 +183,7 @@ Las dependencias siempre apuntan hacia el núcleo del negocio, manteniendo el do
 ### Architecture Overview
 
 ```text
-       ┌──────────────┐
+                   ┌──────────────┐
                    │   WhatsApp   │
                    │    / HTTP    │
                    └──────┬───────┘
