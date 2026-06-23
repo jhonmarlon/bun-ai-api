@@ -30,121 +30,166 @@ El sistema responde preguntas académicas usando el contexto del estudiante, sus
 
 ## Project Structure
 
-```txt
-src/
-  domain/
-    entities/
-    policies/
+```text
+src
+├── domain
+│   ├── entities
+│   ├── value-objects
+│   ├── policies
+│   └── repositories
+│
+├── application
+│   ├── ports
+│   │   ├── input
+│   │   └── output
+│   ├── use-cases
+│   └── dto
+│
+├── infrastructure
+│   ├── ai
+│   │   ├── groq
+│   │   └── cerebras
+│   ├── whatsapp
+│   ├── persistence
+│   └── external-services
+│
+├── presentation
+│   ├── http
+│   │   ├── controllers
+│   │   ├── routes
+│   │   └── middleware
+│   └── whatsapp
+│
+└── shared
+    ├── config
+    ├── constants
+    ├── di
+    ├── logger
+    └── utils
+```
 
-  application/
-    ports/
-    use-cases/
+### Layer Responsibilities
 
-  presentation/
-    http/
-      controllers/
-      routes/
-      dto/
+#### Domain
 
-  infrastructure/
-    ai/
-    persistence/
-    whatsapp/
+Contiene las reglas centrales del negocio y no depende de ninguna tecnología externa.
 
-  shared/
-    config/
-    di/
-    utils/
-Layers
-- domain: entidades y reglas del negocio
-- application: casos de uso y puertos
-- presentation: controllers y routes HTTP
-- infrastructure: integración con IA, WhatsApp y persistencia
-- shared: configuración, utilidades y composición de dependencias
-Requirements
-- Bun (https://bun.sh/)
-- Una cuenta de WhatsApp para vincular el bot
-- API keys de los proveedores de IA
-Installation
-bun install
-Environment Variables
-Creá un archivo .env con algo como esto:
-PORT=3000
-GROQ_API_KEY=your_groq_key
-CEREBRAS_API_KEY=your_cerebras_key
-Run Locally
-bun run index.ts
-o en desarrollo:
-bun --watch run index.ts
-WhatsApp Authentication
-La primera vez que ejecutes la app, se generará un QR en consola.
-Debés escanearlo con la cuenta de WhatsApp que actuará como bot.
-Importante
-- .wwebjs_auth/ guarda la sesión autenticada
-- .wwebjs_cache/ guarda cache local
-- ninguno de esos directorios debe subirse al repositorio
-Agregalos a tu .gitignore:
-.wwebjs_auth/
-.wwebjs_cache/
-Endpoints
-POST /chat
-Canal HTTP para probar el caso de uso académico.
-Body
-{
-  "userId": 1,
-  "messages": [
-    {
-      "role": "user",
-      "content": "¿Qué actividades tengo pendientes?"
-    }
-  ]
-}
-Response
-Stream de texto generado por la IA.
-POST /enviar-mensaje
-Envía un mensaje manual por WhatsApp.
-Body
-{
-  "phoneNumber": "+573001112233",
-  "message": "Hola"
-}
-WhatsApp Bidirectional Flow
-1. Un estudiante envía un mensaje al número del bot
-2. El listener de WhatsApp captura el mensaje
-3. El sistema identifica al estudiante por phoneNumber
-4. Se ejecuta el caso de uso académico con contexto Moodle
-5. La respuesta se envía de vuelta por WhatsApp
-Nota
-Actualmente la relación estudiante ↔ número telefónico se resuelve con datos mock.
-Academic Safety Rules
-La IA puede:
-- explicar conceptos del curso
-- ayudar a preparar evaluaciones
-- resumir temas del syllabus
-- orientar sobre actividades pendientes
-- mostrar progreso y calificaciones
-La IA no puede:
-- revelar respuestas de quizzes
-- entregar solucionarios
-- responder exámenes directamente
-- inventar información fuera del contexto académico del estudiante
-Current Status
-- Moodle integrado actualmente con repositorio mock
-- Historial de conversación en memoria
-- WhatsApp funcional para pruebas locales
-- Arquitectura preparada para evolucionar hacia Moodle API o base de datos real
-Next Steps
-- Integrar Moodle API real
-- Persistir conversaciones en base de datos
-- Mejorar identificación de contactos WhatsApp
-- Preparar estrategia de sesión estable para despliegues cloud
-Example Use Cases
-- “¿Qué actividades tengo pendientes?”
-- “Ayudame a entender qué es una variable”
-- “¿Cómo me preparo para el quiz de programación?”
-- “¿Cuál es mi progreso en el curso?”
-Notes
-- Si un número no está registrado en el sistema académico, el bot responde informando que no puede atenderlo todavía.
-- Las respuestas de IA son sanitizadas para evitar exponer bloques internos como <think>...</think>.
-License
-MIT
+- Entities
+- Value Objects
+- Domain Policies
+- Repository Contracts
+
+**Ejemplos:**
+
+- Student
+- Course
+- Activity
+- AcademicSafetyPolicy
+
+---
+
+#### Application
+
+Orquesta los casos de uso de la aplicación.
+
+- Use Cases
+- Input/Output Ports
+- DTOs
+- Business Workflows
+
+**Ejemplos:**
+
+- AskAcademicQuestionUseCase
+- GetPendingActivitiesUseCase
+- ValidateAcademicRequestUseCase
+
+---
+
+#### Infrastructure
+
+Implementaciones concretas de servicios externos.
+
+- WhatsApp Integration
+- AI Providers
+- Moodle Repository
+- Database Access
+- External APIs
+
+**Ejemplos:**
+
+- GroqAIProvider
+- CerebrasAIProvider
+- WhatsAppWebClient
+- MockMoodleRepository
+
+---
+
+#### Presentation
+
+Puntos de entrada al sistema.
+
+- HTTP Controllers
+- REST Routes
+- WhatsApp Message Handlers
+- Request Validation
+
+**Ejemplos:**
+
+- ChatController
+- WhatsAppWebhookHandler
+
+---
+
+#### Shared
+
+Componentes reutilizables y configuración transversal.
+
+- Dependency Injection
+- Environment Configuration
+- Logging
+- Utilities
+- Constants
+
+---
+
+### Dependency Flow
+
+```text
+Presentation
+      ↓
+Application
+      ↓
+Domain
+
+Infrastructure ─────► Application
+Infrastructure ─────► Domain
+```
+
+Las dependencias siempre apuntan hacia el núcleo del negocio, manteniendo el dominio aislado de frameworks, proveedores de IA y tecnologías externas.
+```
+
+## Architecture Overview
+
+```text
+                   ┌──────────────┐
+                   │   WhatsApp   │
+                   └──────┬───────┘
+                          │
+                   ┌──────▼───────┐
+                   │ Presentation │
+                   └──────┬───────┘
+                          │
+                   ┌──────▼───────┐
+                   │ Application  │
+                   └──────┬───────┘
+                          │
+                   ┌──────▼───────┐
+                   │    Domain    │
+                   └──────┬───────┘
+                          │
+          ┌───────────────┼────────────────┐
+          │               │                │
+   ┌──────▼─────┐ ┌──────▼─────┐ ┌────────▼──────┐
+   │ Moodle API │ │    Groq    │ │   Cerebras    │
+   └────────────┘ └────────────┘ └───────────────┘
+```
